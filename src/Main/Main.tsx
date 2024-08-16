@@ -8,19 +8,22 @@ import Header from "../components/Header/Header";
 const Main = () => {
   const dispatch: AppDispatch = useDispatch();
   const location = useSelector((state: RootState) => state.location.location);
-  const searchVal = useSelector((state: RootState) => state.search.value);
+  const finalSearchVal = useSelector(
+    (state: RootState) => state.search.finalValue
+  );
   const weather: any = useSelector(
     (state: RootState) => state.weather?.weather
   );
+
   // const dailyItems: any = useSelector(
   //   (state: RootState) => state.weather?.weather?.dailyItems
   // );
 
   useEffect(() => {
     if (location) {
-      dispatch(fetchWeather({ location, searchVal }));
+      dispatch(fetchWeather({ location, finalSearchVal }));
     }
-  }, [dispatch, location, searchVal]);
+  }, [dispatch, location, finalSearchVal]);
 
   return (
     <div>

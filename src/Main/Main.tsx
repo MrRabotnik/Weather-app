@@ -46,7 +46,7 @@ const Main = () => {
             const timePart = dateTimeString.split(" ")[1];
             const hours = parseInt(timePart.split(":")[0]);
 
-            if (hours >= currentHour && hours - currentHour < 3) {
+            if (hours - currentHour < 3) {
                 closestItem = item;
             }
         });
@@ -55,8 +55,6 @@ const Main = () => {
             setCurrentItem(closestItem);
         }
     }, [selectedDay, weather]);
-
-    console.log(status);
 
     return (
         <>

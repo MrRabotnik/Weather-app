@@ -27,6 +27,11 @@ const Header = () => {
                     id=""
                     value={searchVal}
                     onChange={(e: any) => handleOnChange(e.target.value)}
+                    onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                            submitSearch();
+                        }
+                    }}
                 />
                 <button onClick={submitSearch}>Search for City</button>
             </div>

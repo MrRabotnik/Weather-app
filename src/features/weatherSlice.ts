@@ -16,26 +16,29 @@ const initialState: WeatherState = {
   error: null,
 };
 
-const generateQuery = ({ location, searchVal }: any) => {
+const generateQuery = ({ location, finalValue }: any) => {
   let query;
   const lan = location.latitude.toFixed(2);
   const lon = location.longitude.toFixed(2);
   const lanQuery = lan ? `lan=${lan}` : "";
   const lonQuery = lon ? `&lon=${lon}` : "";
-  const cityQuery = searchVal.length ? `&q=${searchVal}` : "";
+  const cityQuery = finalValue?.length ? `&q=${finalValue}` : "";
   query = `${lanQuery}${lonQuery}${cityQuery}&appid=${API_KEY}`;
-
+  console.log("Generated query:", query);
   return query;
 };
 
 export const fetchWeather: any = createAsyncThunk(
   "weather/fetchWeather",
-  async ({ location, searchVal }: any) => {
-    if (location) {
-      const query = generateQuery({ location, searchVal });
-      const response = await axiosInstance.get(`data/2.5/weather?${query}`);
-
+  async ({ location, finalValue }: any) => {
+    try {
+      const query = generateQuery({ location, finalValue });
+      console.log(query);
+      const response = await axiosInstance.get(`data/2.5/onecall?${query}`);
       return response.data;
+    } catch (error) {
+      console.error("Error fetching weather:", error);
+      throw error;
     }
   }
 );

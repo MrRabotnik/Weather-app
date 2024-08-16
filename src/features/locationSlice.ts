@@ -16,7 +16,6 @@ export const getLocation: any = createAsyncThunk(
   "location/getLocation",
   async () => {
     const res = await getCurrentLocation();
-    console.log(res);
     return res;
   }
 );

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import "./DailyItem.scss";
+import { ASSETS_URI } from "../../utils/api";
 
 const DailyItem = ({ items, click, unit }: any) => {
     const [currentItem, setCurrentItem] = useState<any>({});
@@ -32,6 +33,10 @@ const DailyItem = ({ items, click, unit }: any) => {
             <h2>
                 {currentItem?.main?.temp} {unit === "metric" ? "C" : "F"}
             </h2>
+            <img
+                src={`${ASSETS_URI}/${currentItem?.weather?.[0]?.icon}.png`}
+                alt="Icon"
+            />
         </div>
     );
 };

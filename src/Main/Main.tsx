@@ -42,10 +42,6 @@ const Main = () => {
                             <div>
                                 <h1>{city.name}</h1>
                                 {/* <h3>{weather[selectedDay].weather[0].main}</h3>
-                                <p>{weather[selectedDay].weather[0].description}</p>
-                                <img
-                                    src={`${API_URI}/${weather[selectedDay].weather[0].icon}`}
-                                    alt=""
                                 /> */}
                             </div>
                         ) : (

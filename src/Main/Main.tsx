@@ -24,7 +24,7 @@ const Main = () => {
 
     useEffect(() => {
         if (location) {
-            dispatch(fetchWeather({ location, finalSearchVal, unit }));
+            dispatch(fetchWeather({ location, finalValue: finalSearchVal, unit }));
         }
     }, [dispatch, location, finalSearchVal, unit]);
 

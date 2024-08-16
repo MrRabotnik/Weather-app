@@ -15,6 +15,7 @@ const Main = () => {
     const finalSearchVal = useSelector((state: RootState) => state.search.finalValue);
     const unit = useSelector((state: RootState) => state.search.unit);
     const weather: any = useSelector((state: RootState) => state.weather?.weather);
+    const status: any = useSelector((state: RootState) => state.weather?.status);
     const city: any = useSelector((state: RootState) => state.weather?.city);
 
     const [selectedDay, setSelectedDay] = useState(0);
@@ -28,28 +29,34 @@ const Main = () => {
     }, [dispatch, location, finalSearchVal, unit]);
 
     useEffect(() => {
-        if (weather) setHourlyItems(weather[selectedDay]);
-    }, [selectedDay, weather]);
-
-    useEffect(() => {
         if (!weather) return;
 
         const items = weather[selectedDay];
         if (!items) return;
 
+        setHourlyItems(items);
+
         const currentDateTime = new Date();
         const currentHour = currentDateTime.getHours();
+
+        let closestItem = null;
 
         items.forEach((item: any) => {
             const dateTimeString = item.dt_txt;
             const timePart = dateTimeString.split(" ")[1];
-            const hours = timePart.split(":")[0];
+            const hours = parseInt(timePart.split(":")[0]);
 
-            if (parseInt(hours) - currentHour < 3) {
-                setCurrentItem(item);
+            if (hours >= currentHour && hours - currentHour < 3) {
+                closestItem = item;
             }
         });
+
+        if (closestItem) {
+            setCurrentItem(closestItem);
+        }
     }, [selectedDay, weather]);
+
+    console.log(status);
 
     return (
         <>
@@ -68,6 +75,8 @@ const Main = () => {
                                     alt="Icon"
                                 />
                             </div>
+                        ) : status === "loading" ? (
+                            "Loading..."
                         ) : (
                             "No results"
                         )}

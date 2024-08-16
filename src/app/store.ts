@@ -4,11 +4,11 @@ import searchReducer from "../features/searchSlice";
 import locationReducer from "../features/locationSlice";
 
 const store = configureStore({
-  reducer: {
-    weather: weatherReducer,
-    search: searchReducer,
-    location: locationReducer,
-  },
+    reducer: {
+        weather: weatherReducer,
+        search: searchReducer,
+        location: locationReducer,
+    },
 });
 
 export type RootState = ReturnType<typeof store.getState>;

@@ -5,18 +5,21 @@ import { getLocation } from "./features/locationSlice";
 import { useDispatch } from "react-redux";
 
 function App() {
-  const dispatch = useDispatch();
-  useEffect(() => {
-    dispatch(getLocation());
-  }, [dispatch]);
+    const dispatch = useDispatch();
+    useEffect(() => {
+        dispatch(getLocation());
+    }, [dispatch]);
 
-  return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Main />} />
-      </Routes>
-    </BrowserRouter>
-  );
+    return (
+        <BrowserRouter>
+            <Routes>
+                <Route
+                    path="/"
+                    element={<Main />}
+                />
+            </Routes>
+        </BrowserRouter>
+    );
 }
 
 export default App;

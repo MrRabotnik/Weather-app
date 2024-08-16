@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../app/store";
 import { fetchWeather } from "../features/weatherSlice";
@@ -10,18 +10,27 @@ import HourlyItem from "../components/HourlyItem/HourlyItem";
 
 const Main = () => {
     const dispatch: AppDispatch = useDispatch();
+
     const location = useSelector((state: RootState) => state.location.location);
     const finalSearchVal = useSelector((state: RootState) => state.search.finalValue);
+    const unit = useSelector((state: RootState) => state.search.unit);
     const weather: any = useSelector((state: RootState) => state.weather?.weather);
+    const city: any = useSelector((state: RootState) => state.weather?.city);
 
-    const dailyItems: any = useSelector((state: RootState) => state.weather?.weather?.dailyItems);
-    const hourlyItems: any = useSelector((state: RootState) => state.weather?.weather?.hourlyItems);
+    // console.log(weather);
+
+    const [selectedDay, setSelectedDay] = useState(0);
+    const [hourlyItems, setHourlyItems] = useState([]);
 
     useEffect(() => {
         if (location) {
-            // dispatch(fetchWeather({ location, finalSearchVal }));
+            dispatch(fetchWeather({ location, finalSearchVal, unit }));
         }
-    }, [dispatch, location, finalSearchVal]);
+    }, [dispatch, location, finalSearchVal, unit]);
+
+    useEffect(() => {
+        if (weather) setHourlyItems(weather[selectedDay]);
+    }, [selectedDay, weather]);
 
     return (
         <>
@@ -31,19 +40,20 @@ const Main = () => {
                     <div className="left-part">
                         {weather ? (
                             <div>
-                                <h1>{weather[0].main}</h1>
-                                <p>{weather[0].description}</p>
+                                <h1>{city.name}</h1>
+                                {/* <h3>{weather[selectedDay].weather[0].main}</h3>
+                                <p>{weather[selectedDay].weather[0].description}</p>
                                 <img
-                                    src={`${API_URI}/${weather[0].icon}`}
+                                    src={`${API_URI}/${weather[selectedDay].weather[0].icon}`}
                                     alt=""
-                                />
+                                /> */}
                             </div>
                         ) : (
                             "No results"
                         )}
                     </div>
                     <div className="right-part">
-                        {hourlyItems &&
+                        {/* {hourlyItems &&
                             hourlyItems.map((item: any, index: number) => {
                                 return (
                                     <HourlyItem
@@ -51,16 +61,20 @@ const Main = () => {
                                         item={item}
                                     />
                                 );
-                            })}
+                            })} */}
                     </div>
                 </div>
                 <div className="bottom-part">
-                    {dailyItems &&
-                        dailyItems.map((item: any, index: number) => {
+                    {weather &&
+                        weather.map((item: any, index: number) => {
                             return (
                                 <DailyItem
                                     key={index}
-                                    item={item}
+                                    items={item}
+                                    unit={unit}
+                                    click={() => {
+                                        setSelectedDay(index);
+                                    }}
                                 />
                             );
                         })}

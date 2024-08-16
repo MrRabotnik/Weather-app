@@ -4,16 +4,14 @@ import axiosInstance from "../utils/axios.interceptors";
 
 interface WeatherState {
     weather: any;
-    dailyItems: any;
-    hourlyItems: any;
+    city: any;
     status: "idle" | "loading" | "succeeded" | "failed";
     error: string | null;
 }
 
 const initialState: WeatherState = {
     weather: null,
-    dailyItems: null,
-    hourlyItems: null,
+    city: null,
     status: "idle",
     error: null,
 };
@@ -25,23 +23,25 @@ const generateQuery = ({ location, finalValue, unit }: any) => {
     const lanQuery = lan ? `lan=${lan}` : "";
     const lonQuery = lon ? `&lon=${lon}` : "";
     const cityQuery = finalValue?.length ? `&q=${finalValue}` : "&q=Yerevan";
-    const unitQuery = unit?.length ? `&unit=${unit}` : ""; // Empty string is for Kelvin
+    const unitQuery = unit?.length ? `&units=${unit}` : ""; // Empty string is for Kelvin
     query = `${lanQuery}${lonQuery}${cityQuery}&appid=${API_KEY}${unitQuery}`;
 
     return query;
 };
 
-export const fetchWeather: any = createAsyncThunk("weather/fetchWeather", async ({ location, finalValue }: any) => {
-    try {
-        const query = generateQuery({ location, finalValue });
-        console.log(query);
-        const response = await axiosInstance.get(`data/2.5/weather?${query}`);
-        return response.data;
-    } catch (error) {
-        console.error("Error fetching weather:", error);
-        throw error;
+export const fetchWeather: any = createAsyncThunk(
+    "weather/fetchWeather",
+    async ({ location, finalValue, unit }: any) => {
+        try {
+            const query = generateQuery({ location, finalValue, unit });
+            const response = await axiosInstance.get(`data/2.5/forecast?${query}`);
+            return response.data;
+        } catch (error) {
+            console.error("Error fetching weather:", error);
+            throw error;
+        }
     }
-});
+);
 
 const weatherSlice = createSlice({
     name: "weather",
@@ -53,8 +53,33 @@ const weatherSlice = createSlice({
                 state.status = "loading";
             })
             .addCase(fetchWeather.fulfilled, (state, action) => {
+                const list = action.payload.list;
+                let newList: any = [];
+
+                if (list) {
+                    let currentItemsStartIndex = 0;
+
+                    list.forEach((item: any, index: number) => {
+                        const dateTimeString = item.dt_txt;
+                        const timePart = dateTimeString.split(" ")[1];
+                        const hours = timePart.split(":")[0];
+
+                        if (hours === "00") {
+                            newList.push(list.slice(currentItemsStartIndex, index));
+                            currentItemsStartIndex = index;
+                        }
+                    });
+
+                    if (currentItemsStartIndex < list.length) {
+                        newList.push(list.slice(currentItemsStartIndex));
+                    }
+                }
+
+                console.log(newList);
+
                 state.status = "succeeded";
-                state.weather = action.payload.weather;
+                state.weather = newList;
+                state.city = action.payload.city;
                 state.error = null;
             })
             .addCase(fetchWeather.rejected, (state, action) => {

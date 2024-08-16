@@ -2,11 +2,11 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../app/store";
 import { fetchWeather } from "../features/weatherSlice";
-import { API_URI } from "../utils/api";
 import Header from "../components/Header/Header";
 import "./Main.scss";
 import DailyItem from "../components/DailyItem/DailyItem";
 import HourlyItem from "../components/HourlyItem/HourlyItem";
+import { ASSETS_URI } from "../utils/api";
 
 const Main = () => {
     const dispatch: AppDispatch = useDispatch();
@@ -17,9 +17,8 @@ const Main = () => {
     const weather: any = useSelector((state: RootState) => state.weather?.weather);
     const city: any = useSelector((state: RootState) => state.weather?.city);
 
-    // console.log(weather);
-
     const [selectedDay, setSelectedDay] = useState(0);
+    const [currentItem, setCurrentItem] = useState<any>({});
     const [hourlyItems, setHourlyItems] = useState([]);
 
     useEffect(() => {
@@ -32,6 +31,26 @@ const Main = () => {
         if (weather) setHourlyItems(weather[selectedDay]);
     }, [selectedDay, weather]);
 
+    useEffect(() => {
+        if (!weather) return;
+
+        const items = weather[selectedDay];
+        if (!items) return;
+
+        const currentDateTime = new Date();
+        const currentHour = currentDateTime.getHours();
+
+        items.forEach((item: any) => {
+            const dateTimeString = item.dt_txt;
+            const timePart = dateTimeString.split(" ")[1];
+            const hours = timePart.split(":")[0];
+
+            if (parseInt(hours) - currentHour < 3) {
+                setCurrentItem(item);
+            }
+        });
+    }, [selectedDay, weather]);
+
     return (
         <>
             <Header />
@@ -41,23 +60,29 @@ const Main = () => {
                         {weather ? (
                             <div>
                                 <h1>{city.name}</h1>
-                                {/* <h3>{weather[selectedDay].weather[0].main}</h3>
-                                /> */}
+                                <h3>
+                                    {currentItem?.main?.temp} {unit === "metric" ? "C" : "F"}
+                                </h3>
+                                <img
+                                    src={`${ASSETS_URI}/${currentItem?.weather?.[0]?.icon}.png`}
+                                    alt="Icon"
+                                />
                             </div>
                         ) : (
                             "No results"
                         )}
                     </div>
                     <div className="right-part">
-                        {/* {hourlyItems &&
+                        {hourlyItems &&
                             hourlyItems.map((item: any, index: number) => {
                                 return (
                                     <HourlyItem
                                         key={index}
                                         item={item}
+                                        unit={unit}
                                     />
                                 );
-                            })} */}
+                            })}
                     </div>
                 </div>
                 <div className="bottom-part">
@@ -68,6 +93,8 @@ const Main = () => {
                                     key={index}
                                     items={item}
                                     unit={unit}
+                                    selectedDay={selectedDay}
+                                    placement={index}
                                     click={() => {
                                         setSelectedDay(index);
                                     }}

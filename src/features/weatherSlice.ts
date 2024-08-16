@@ -43,6 +43,32 @@ export const fetchWeather: any = createAsyncThunk(
     }
 );
 
+const rearrangeWeatherList = (arr: any) => {
+    const list = arr;
+    let newList: any = [];
+
+    if (list) {
+        let currentItemsStartIndex = 0;
+
+        list.forEach((item: any, index: number) => {
+            const dateTimeString = item.dt_txt;
+            const timePart = dateTimeString.split(" ")[1];
+            const hours = timePart.split(":")[0];
+
+            if (hours === "00") {
+                newList.push(list.slice(currentItemsStartIndex, index));
+                currentItemsStartIndex = index;
+            }
+        });
+
+        if (currentItemsStartIndex < list.length) {
+            newList.push(list.slice(currentItemsStartIndex));
+        }
+    }
+
+    return newList;
+};
+
 const weatherSlice = createSlice({
     name: "weather",
     initialState,
@@ -53,32 +79,8 @@ const weatherSlice = createSlice({
                 state.status = "loading";
             })
             .addCase(fetchWeather.fulfilled, (state, action) => {
-                const list = action.payload.list;
-                let newList: any = [];
-
-                if (list) {
-                    let currentItemsStartIndex = 0;
-
-                    list.forEach((item: any, index: number) => {
-                        const dateTimeString = item.dt_txt;
-                        const timePart = dateTimeString.split(" ")[1];
-                        const hours = timePart.split(":")[0];
-
-                        if (hours === "00") {
-                            newList.push(list.slice(currentItemsStartIndex, index));
-                            currentItemsStartIndex = index;
-                        }
-                    });
-
-                    if (currentItemsStartIndex < list.length) {
-                        newList.push(list.slice(currentItemsStartIndex));
-                    }
-                }
-
-                console.log(newList);
-
                 state.status = "succeeded";
-                state.weather = newList;
+                state.weather = rearrangeWeatherList(action.payload.list);
                 state.city = action.payload.city;
                 state.error = null;
             })

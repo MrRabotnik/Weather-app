@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import "./DailyItem.scss";
 import { ASSETS_URI } from "../../utils/api";
 
-const DailyItem = ({ items, click, unit }: any) => {
+const DailyItem = ({ items, click, unit, selectedDay, placement }: any) => {
     const [currentItem, setCurrentItem] = useState<any>({});
 
     useEffect(() => {
@@ -22,11 +22,9 @@ const DailyItem = ({ items, click, unit }: any) => {
         });
     }, [items]);
 
-    console.log(currentItem);
-    console.log(unit);
     return (
         <div
-            className="daily-item"
+            className={`daily-item ${selectedDay === placement ? "selected" : ""}`}
             onClick={click}
         >
             <p>{currentItem?.dt_txt}</p>
